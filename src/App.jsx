@@ -5,6 +5,7 @@ import AddOrganization from "./pages/AddOrganization";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import "./App.css";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard/>} />
       </Routes>
     </BrowserRouter>
   );

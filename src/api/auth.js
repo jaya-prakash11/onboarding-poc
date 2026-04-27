@@ -24,6 +24,18 @@ async function fetchAPI(endpoint, options = {}) {
   return response.json();
 }
 
+function buildOrganizationPayload(data) {
+  return {
+    organizationName: data.organizationName,
+    contactEmail: data.contactEmail,
+    contactPhone: data.contactPhone,
+    domain: data.domain,
+    adminEmail: data.adminEmail,
+    adminFirstName: data.adminFirstName,
+    adminLastName: data.adminLastName,
+  };
+}
+
 export const authAPI = {
   login: async (email, password) => {
     return fetchAPI("/auth/login", {
@@ -83,7 +95,7 @@ export const organizationAPI = {
   create: async (data) => {
     return fetchAPI("/organizations", {
       method: "POST",
-      body: JSON.stringify(data),
+      body: JSON.stringify(buildOrganizationPayload(data)),
     });
   },
 
@@ -102,6 +114,19 @@ export const organizationAPI = {
   listUsers: async () => {
     return fetchAPI("/organizations/users", {
       method: "GET",
+    });
+  },
+
+  update: async (organizationId, data) => {
+    return fetchAPI(`/organizations/${organizationId}`, {
+      method: "PATCH",
+      body: JSON.stringify(buildOrganizationPayload(data)),
+    });
+  },
+
+  remove: async (organizationId) => {
+    return fetchAPI(`/organizations/${organizationId}`, {
+      method: "DELETE",
     });
   },
 };
