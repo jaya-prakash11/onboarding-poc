@@ -14,8 +14,10 @@ function ForgotPassword() {
     setLoading(true);
 
     try {
-      const resetUrl = `${window.location.origin}/reset-password`;
-      await authAPI.forgotPassword(email, resetUrl);
+      const resetUrl = `${window.location.origin}/set-password`;
+
+      console.log("Sending forgot password request for:", resetUrl);
+      await authAPI.forgotPassword(email);
       setSuccess(true);
     } catch (err) {
       setError(err.message || "Failed to send reset email. Please try again.");

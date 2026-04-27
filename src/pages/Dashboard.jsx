@@ -2,7 +2,10 @@ import { Link } from "react-router-dom";
 
 function Dashboard() {
   return (
-    <div className="min-h-screen bg-slate-100 px-4 py-8 sm:px-6 lg:px-10">
+    <div
+      className="min-h-screen bg-slate-100 px-4 py-8 sm:px-6 lg:px-10"
+      style={{ paddingTop: "80px" }}
+    >
       <div className="mx-auto max-w-5xl space-y-6">
         <section className="rounded-3xl bg-gradient-to-r from-slate-900 via-slate-800 to-blue-900 px-6 py-8 text-left text-white shadow-xl sm:px-8">
           <p className="text-sm uppercase tracking-[0.25em] text-blue-200">

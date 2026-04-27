@@ -36,6 +36,19 @@ function buildOrganizationPayload(data) {
   };
 }
 
+function buildRegisterOrgPayload(data) {
+  return {
+    organizationName: data.organizationName,
+    contactEmail: data.contactEmail,
+    contactPhone: data.contactPhone,
+    domain: data.domain,
+    adminEmail: data.adminEmail,
+    adminFirstName: data.adminFirstName,
+    adminLastName: data.adminLastName,
+    passwordSetupUrl: `${window.location.origin}/password-setup`,
+  };
+}
+
 export const authAPI = {
   login: async (email, password) => {
     return fetchAPI("/auth/login", {
@@ -65,25 +78,47 @@ export const authAPI = {
     });
   },
 
+  registerOrganization: async (data) => {
+    return fetchAPI("/auth/register-organization", {
+      method: "POST",
+      body: JSON.stringify(buildRegisterOrgPayload(data)),
+    });
+  },
+
   setPassword: async (token, password) => {
     return fetchAPI("/auth/password/set", {
       method: "POST",
       body: JSON.stringify({ token, password }),
     });
   },
+
+  logout: async (refreshToken) => {
+    return fetchAPI("/auth/logout", {
+      method: "POST",
+      body: JSON.stringify({ refreshToken }),
+    });
+  },
 };
 
 export const authService = {
-  setTokens: (accessToken) => {
+  setTokens: (accessToken, refreshToken) => {
     localStorage.setItem("accessToken", accessToken);
+    if (refreshToken) {
+      localStorage.setItem("refreshToken", refreshToken);
+    }
   },
 
   getAccessToken: () => {
     return localStorage.getItem("accessToken");
   },
 
+  getRefreshToken: () => {
+    return localStorage.getItem("refreshToken");
+  },
+
   clearTokens: () => {
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
   },
 
   isAuthenticated: () => {

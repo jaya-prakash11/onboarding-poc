@@ -18,7 +18,10 @@ function Login() {
 
     try {
       const result = await authAPI.login(email, password);
-      authService.setTokens(result.tokens.accessToken);
+      authService.setTokens(
+        result.tokens.accessToken,
+        result.tokens.refreshToken,
+      );
       navigate("/dashboard");
     } catch (err) {
       setError(err.message || "Login failed. Please try again.");
@@ -106,19 +109,17 @@ function Login() {
             >
               Forgot password?
             </Link>
+            <span className="text-gray-300"> | </span>
+            <Link
+              to="/set-password"
+              className="text-sm text-blue-600 hover:underline"
+            >
+              Set up password
+            </Link>
             <p className="text-sm text-gray-600 mt-2">
               Don't have an account?{" "}
               <Link to="/signup" className="text-blue-600 hover:underline">
                 Sign up
-              </Link>
-            </p>
-            <p className="text-sm text-gray-600 mt-2">
-              Want to onboard your organization?{" "}
-              <Link
-                to="/add-organization"
-                className="text-blue-600 hover:underline"
-              >
-                Onboard Organization
               </Link>
             </p>
           </div>
