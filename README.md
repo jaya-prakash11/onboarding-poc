@@ -6,18 +6,24 @@ A modern admin panel frontend for user authentication, password management, and 
 
 ### Authentication
 
-- ✅ **Login** - Email/password authentication with JWT tokens
-- ✅ **Signup** - User registration with form validation
-- ✅ **Forgot Password** - Password reset flow via email
-- ✅ **Reset Password** - Set new password with token validation
-- ✅ **Token Management** - Access token storage and refresh capability
+- ✅ **Login** - Email/password authentication with JWT access & refresh tokens
+- ✅ **Organization Registration** - Signup creates organization + admin user
+- ✅ **Forgot Password** - Password reset request via email
+- ✅ **Password Setup** - Set password from email invitation/reset links
+- ✅ **Token Management** - Access & refresh token storage with rotation
+- ✅ **Logout** - Secure logout with token revocation
 
 ### Organization Management
 
-- ✅ **Dashboard** - Main landing page after login
-- ✅ **Create Organization** - Form to create new organizations (integration ready)
-- ✅ **Onboard Organization** - Organization onboarding request form
-- ✅ **Add Organization** - Dedicated organization setup page
+- ✅ **Dashboard** - Protected main landing page after login
+- ✅ **Organization Registration** - Create organization with admin user
+- ✅ **Add Organization** - Organization onboarding form
+
+### Security & Protection
+
+- ✅ **Protected Routes** - Dashboard only accessible when authenticated
+- ✅ **Header with Logout** - Persistent header with logout functionality
+- ✅ **Token Refresh** - Automatic token refresh on expiry
 
 ### UI/UX
 
@@ -35,22 +41,25 @@ A modern admin panel frontend for user authentication, password management, and 
 - **Styling**: Tailwind CSS 4.2.3
 - **Routing**: React Router DOM
 - **Backend API**: NestJS (POC App)
+- **Port**: 3001 (configured for backend integration)
 
 ## Project Structure
 
 ```
 src/
 ├── api/
-│   └── auth.js              # API service for authentication & organizations
+│   └── auth.js              # API service for auth & organization registration
+├── components/
+│   └── Header.jsx           # Persistent header with logout button
 ├── pages/
 │   ├── Login.jsx            # Login page with email/password form
-│   ├── Signup.jsx           # User registration page
-│   ├── ForgotPassword.jsx    # Password reset request
-│   ├── ResetPassword.jsx     # Set new password with token
-│   ├── Dashboard.jsx         # Main dashboard (post-login)
-│   ├── AddOrganization.jsx   # Organization onboarding form
-│   └── CreateOrganization.jsx # Create organization form
-├── App.jsx                  # Route configuration
+│   ├── Signup.jsx           # Organization registration page
+│   ├── ForgotPassword.jsx   # Password reset request
+│   ├── ResetPassword.jsx    # Legacy reset password (redirects to PasswordSetup)
+│   ├── PasswordSetup.jsx    # Password set/reset from email links
+│   ├── Dashboard.jsx        # Protected main dashboard (post-login)
+│   └── AddOrganization.jsx # Organization onboarding form
+├── App.jsx                  # Route configuration with ProtectedRoute
 ├── main.jsx                 # Entry point
 └── index.css                # Global styles with Tailwind
 ```
@@ -82,7 +91,7 @@ src/
    npm run dev
    ```
 
-The application will be available at `http://localhost:5173`
+The application will be available at `http://localhost:3001`
 
 ## Running the Backend
 
@@ -100,13 +109,15 @@ The backend runs on `http://localhost:3000` by default.
 ### Authentication Endpoints
 
 - `POST /auth/login` - Login with email and password
-- `POST /auth/refresh` - Refresh access token
-- `POST /auth/forgot-password` - Request password reset
-- `POST /auth/password/validate` - Validate reset token
-- `POST /auth/password/set` - Set new password
+- `POST /auth/refresh` - Refresh access token using refresh token
+- `POST /auth/logout` - Logout and revoke refresh token
+- `POST /auth/forgot-password` - Request password reset (email required)
+- `POST /auth/password/validate` - Validate password setup/reset token
+- `POST /auth/password/set` - Set new password using valid token
 
 ### Organization Endpoints
 
+- `POST /auth/register-organization` - Register new organization with admin user
 - `POST /organizations` - Create new organization (Super Admin only)
 - `GET /organizations` - List all organizations (Super Admin only)
 - `GET /organizations/me` - Get current organization details
@@ -138,8 +149,7 @@ This generates optimized files in the `dist/` directory.
 
 ## Features Coming Soon
 
-- [ ] Organization admin user management
-- [ ] User invitation workflow
+- [ ] User invitation workflow (admin can invite users)
 - [ ] Role-based access control (RBAC) UI
 - [ ] Audit logs viewer
 - [ ] Organization settings management
