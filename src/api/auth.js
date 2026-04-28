@@ -37,7 +37,9 @@ function buildOrganizationPayload(data) {
 }
 
 function buildRegisterOrgPayload(data) {
-  return {
+  const baseUrl = window.location.origin;
+  // Only include passwordSetupUrl if we have a valid production-like URL
+  const payload = {
     organizationName: data.organizationName,
     contactEmail: data.contactEmail,
     contactPhone: data.contactPhone,
@@ -45,8 +47,18 @@ function buildRegisterOrgPayload(data) {
     adminEmail: data.adminEmail,
     adminFirstName: data.adminFirstName,
     adminLastName: data.adminLastName,
-    passwordSetupUrl: `${window.location.origin}/password-setup`,
   };
+
+  // Only add passwordSetupUrl if origin looks like a valid URL (not localhost)
+  if (
+    baseUrl &&
+    !baseUrl.includes("localhost") &&
+    !baseUrl.includes("127.0.0.1")
+  ) {
+    payload.passwordSetupUrl = `${baseUrl}/password-setup`;
+  }
+
+  return payload;
 }
 
 export const authAPI = {

@@ -10,6 +10,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const resetSuccess = searchParams.get("reset") === "success";
+  const registered = searchParams.get("registered") === "true";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -61,6 +62,12 @@ function Login() {
           {resetSuccess && (
             <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-md text-sm">
               Password reset successful! Please login with your new password.
+            </div>
+          )}
+          {registered && (
+            <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-md text-sm">
+              Organization registered! Check your email for the password setup
+              link.
             </div>
           )}
           <div className="mb-4 text-left">

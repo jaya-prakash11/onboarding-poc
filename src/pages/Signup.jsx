@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { organizationAPI } from "../api/auth";
+import { authAPI } from "../api/auth";
 
 function Signup() {
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ function Signup() {
     setLoading(true);
 
     try {
-      await organizationAPI.create(formData);
+      await authAPI.registerOrganization(formData);
       // After successful registration, redirect to login
       // The API will send an email with the password setup link
       navigate("/login?registered=true");
