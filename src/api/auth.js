@@ -24,6 +24,24 @@ async function fetchAPI(endpoint, options = {}) {
   return response.json();
 }
 
+async function fetchPublicAPI(endpoint, options = {}) {
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.message || `HTTP error ${response.status}`);
+  }
+
+  return response.json();
+}
+
 function buildOrganizationPayload(data) {
   return {
     organizationName: data.organizationName,
@@ -38,7 +56,6 @@ function buildOrganizationPayload(data) {
 
 function buildRegisterOrgPayload(data) {
   const baseUrl = window.location.origin;
-  // Only include passwordSetupUrl if we have a valid production-like URL
   const payload = {
     organizationName: data.organizationName,
     contactEmail: data.contactEmail,
@@ -49,7 +66,25 @@ function buildRegisterOrgPayload(data) {
     adminLastName: data.adminLastName,
   };
 
-  // Only add passwordSetupUrl if origin looks like a valid URL (not localhost)
+  if (
+    baseUrl &&
+    !baseUrl.includes("localhost") &&
+    !baseUrl.includes("127.0.0.1")
+  ) {
+    payload.passwordSetupUrl = `${baseUrl}/password-setup`;
+  }
+
+  return payload;
+}
+
+function buildSignupPayload(data) {
+  const baseUrl = window.location.origin;
+  const payload = {
+    email: data.email,
+    firstName: data.firstName,
+    lastName: data.lastName,
+  };
+
   if (
     baseUrl &&
     !baseUrl.includes("localhost") &&
@@ -63,42 +98,49 @@ function buildRegisterOrgPayload(data) {
 
 export const authAPI = {
   login: async (email, password) => {
-    return fetchAPI("/auth/login", {
+    return fetchPublicAPI("/auth/login", {
       method: "POST",
       body: JSON.stringify({ email, password }),
     });
   },
 
   refresh: async (refreshToken) => {
-    return fetchAPI("/auth/refresh", {
+    return fetchPublicAPI("/auth/refresh", {
       method: "POST",
       body: JSON.stringify({ refreshToken }),
     });
   },
 
   forgotPassword: async (email, resetUrl) => {
-    return fetchAPI("/auth/forgot-password", {
+    return fetchPublicAPI("/auth/forgot-password", {
       method: "POST",
       body: JSON.stringify({ email, resetUrl }),
     });
   },
 
   validatePasswordToken: async (token) => {
-    return fetchAPI("/auth/password/validate", {
+    return fetchPublicAPI("/auth/password/validate", {
       method: "POST",
       body: JSON.stringify({ token }),
     });
   },
 
+  signup: async (data) => {
+    return fetchPublicAPI("/auth/signup", {
+      method: "POST",
+      body: JSON.stringify(buildSignupPayload(data)),
+    });
+  },
+
   registerOrganization: async (data) => {
-    return fetchAPI("/auth/register-organization", {
+    return fetchPublicAPI("/auth/register-organization", {
       method: "POST",
       body: JSON.stringify(buildRegisterOrgPayload(data)),
     });
   },
 
   setPassword: async (token, password) => {
-    return fetchAPI("/auth/password/set", {
+    return fetchPublicAPI("/auth/password/set", {
       method: "POST",
       body: JSON.stringify({ token, password }),
     });
@@ -120,6 +162,24 @@ export const authService = {
     }
   },
 
+  setUser: (user) => {
+    localStorage.setItem("user", JSON.stringify(user));
+  },
+
+  getUser: () => {
+    const userStr = localStorage.getItem("user");
+    return userStr ? JSON.parse(userStr) : null;
+  },
+
+  getUserRole: () => {
+    const user = authService.getUser();
+    return user?.role || null;
+  },
+
+  isSuperAdmin: () => {
+    return authService.getUserRole() === "SUPER_ADMIN";
+  },
+
   getAccessToken: () => {
     return localStorage.getItem("accessToken");
   },
@@ -131,6 +191,7 @@ export const authService = {
   clearTokens: () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+    localStorage.removeItem("user");
   },
 
   isAuthenticated: () => {
@@ -142,12 +203,31 @@ export const organizationAPI = {
   create: async (data) => {
     return fetchAPI("/organizations", {
       method: "POST",
-      body: JSON.stringify(buildOrganizationPayload(data)),
+      body: JSON.stringify({
+        organizationName: data.organizationName,
+        contactEmail: data.contactEmail,
+        contactPhone: data.contactPhone,
+        domain: data.domain,
+      }),
+    });
+  },
+
+  verify: async (token) => {
+    return fetchPublicAPI("/organizations/verify", {
+      method: "POST",
+      body: JSON.stringify({ token }),
     });
   },
 
   list: async () => {
     return fetchAPI("/organizations", {
+      method: "GET",
+    });
+  },
+
+  discover: async (domain) => {
+    const query = domain ? `?domain=${encodeURIComponent(domain)}` : "";
+    return fetchAPI(`/organizations/discover${query}`, {
       method: "GET",
     });
   },
@@ -167,7 +247,12 @@ export const organizationAPI = {
   update: async (organizationId, data) => {
     return fetchAPI(`/organizations/${organizationId}`, {
       method: "PATCH",
-      body: JSON.stringify(buildOrganizationPayload(data)),
+      body: JSON.stringify({
+        organizationName: data.organizationName,
+        contactEmail: data.contactEmail,
+        contactPhone: data.contactPhone,
+        domain: data.domain,
+      }),
     });
   },
 

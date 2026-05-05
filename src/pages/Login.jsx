@@ -23,7 +23,14 @@ function Login() {
         result.tokens.accessToken,
         result.tokens.refreshToken,
       );
-      navigate("/dashboard");
+      authService.setUser(result.user);
+
+      const redirect = searchParams.get("redirect");
+      if (redirect) {
+        navigate(redirect);
+      } else {
+        navigate("/dashboard");
+      }
     } catch (err) {
       setError(err.message || "Login failed. Please try again.");
     } finally {

@@ -5,13 +5,9 @@ import { authAPI } from "../api/auth";
 function Signup() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    adminFirstName: "",
-    adminLastName: "",
-    adminEmail: "",
-    contactPhone: "",
-    contactEmail: "",
-    domain: "",
-    organizationName: "",
+    email: "",
+    firstName: "",
+    lastName: "",
   });
 
   const [error, setError] = useState("");
@@ -31,12 +27,10 @@ function Signup() {
     setLoading(true);
 
     try {
-      await authAPI.registerOrganization(formData);
-      // After successful registration, redirect to login
-      // The API will send an email with the password setup link
+      await authAPI.signup(formData);
       navigate("/login?registered=true");
     } catch (err) {
-      setError(err.message || "Registration failed. Please try again.");
+      setError(err.message || "Signup failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -54,10 +48,10 @@ function Signup() {
             Flyersoft Admin Panel
           </h1>
           <h1 className="text-4xl font-bold text-gray-800 mt-20">
-            Create Organization
+            Create Your Account
           </h1>
           <p className="text-lg text-gray-600 mt-4">
-            Register your organization to get started
+            Sign up with your email and name to receive a password setup link.
           </p>
         </div>
       </div>
@@ -67,7 +61,7 @@ function Signup() {
           onSubmit={handleSubmit}
         >
           <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">
-            Organization Registration
+            Sign Up
           </h2>
 
           {error && (
@@ -76,111 +70,45 @@ function Signup() {
             </div>
           )}
 
-          {/* Admin First Name */}
           <div className="mb-3">
-            <label htmlFor="adminFirstName" className={labelClass}>
-              Admin First Name *
+            <label htmlFor="firstName" className={labelClass}>
+              First Name *
             </label>
             <input
               type="text"
-              name="adminFirstName"
-              id="adminFirstName"
-              value={formData.adminFirstName}
+              name="firstName"
+              id="firstName"
+              value={formData.firstName}
               onChange={handleChange}
               className={inputClass}
               required
             />
           </div>
 
-          {/* Admin Last Name */}
           <div className="mb-3">
-            <label htmlFor="adminLastName" className={labelClass}>
-              Admin Last Name *
+            <label htmlFor="lastName" className={labelClass}>
+              Last Name *
             </label>
             <input
               type="text"
-              name="adminLastName"
-              id="adminLastName"
-              value={formData.adminLastName}
+              name="lastName"
+              id="lastName"
+              value={formData.lastName}
               onChange={handleChange}
               className={inputClass}
               required
             />
           </div>
 
-          {/* Admin Email */}
-          <div className="mb-3">
-            <label htmlFor="adminEmail" className={labelClass}>
-              Admin Email *
-            </label>
-            <input
-              type="email"
-              name="adminEmail"
-              id="adminEmail"
-              value={formData.adminEmail}
-              onChange={handleChange}
-              className={inputClass}
-              required
-            />
-          </div>
-
-          {/* Contact Phone */}
-          <div className="mb-3">
-            <label htmlFor="contactPhone" className={labelClass}>
-              Contact Phone
-            </label>
-            <input
-              type="tel"
-              name="contactPhone"
-              id="contactPhone"
-              value={formData.contactPhone}
-              onChange={handleChange}
-              className={inputClass}
-            />
-          </div>
-
-          {/* Contact Email */}
-          <div className="mb-3">
-            <label htmlFor="contactEmail" className={labelClass}>
-              Contact Email *
-            </label>
-            <input
-              type="email"
-              name="contactEmail"
-              id="contactEmail"
-              value={formData.contactEmail}
-              onChange={handleChange}
-              className={inputClass}
-              required
-            />
-          </div>
-
-          {/* Domain */}
-          <div className="mb-3">
-            <label htmlFor="domain" className={labelClass}>
-              Domain
-            </label>
-            <input
-              type="text"
-              name="domain"
-              id="domain"
-              value={formData.domain}
-              onChange={handleChange}
-              placeholder="example.com"
-              className={inputClass}
-            />
-          </div>
-
-          {/* Organization Name */}
           <div className="mb-4">
-            <label htmlFor="organizationName" className={labelClass}>
-              Organization Name *
+            <label htmlFor="email" className={labelClass}>
+              Email Address *
             </label>
             <input
-              type="text"
-              name="organizationName"
-              id="organizationName"
-              value={formData.organizationName}
+              type="email"
+              name="email"
+              id="email"
+              value={formData.email}
               onChange={handleChange}
               className={inputClass}
               required
@@ -192,7 +120,7 @@ function Signup() {
             disabled={loading}
             className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors cursor-pointer disabled:bg-blue-400"
           >
-            {loading ? "Registering..." : "Register Organization"}
+            {loading ? "Signing up..." : "Create account"}
           </button>
 
           <div className="mt-4 text-center">
