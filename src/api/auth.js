@@ -5,8 +5,8 @@ function getAuthHeaders() {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-async function fetchAPI(endpoint, options = {}) {
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+function buildRequestOptions(options = {}) {
+  return {
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -14,11 +14,57 @@ async function fetchAPI(endpoint, options = {}) {
       ...options.headers,
     },
     credentials: "include",
+  };
+}
+
+async function refreshAccessToken() {
+  const refreshToken = localStorage.getItem("refreshToken");
+
+  if (!refreshToken) {
+    throw new Error("Authentication required.");
+  }
+
+  const result = await fetchPublicAPI("/auth/refresh", {
+    method: "POST",
+    body: JSON.stringify({ refreshToken }),
   });
+
+  if (result.tokens?.accessToken) {
+    localStorage.setItem("accessToken", result.tokens.accessToken);
+  }
+
+  if (result.tokens?.refreshToken) {
+    localStorage.setItem("refreshToken", result.tokens.refreshToken);
+  }
+
+  if (result.user) {
+    localStorage.setItem("user", JSON.stringify(result.user));
+  }
+
+  return result;
+}
+
+async function fetchAPI(endpoint, options = {}) {
+  let response = await fetch(
+    `${API_BASE_URL}${endpoint}`,
+    buildRequestOptions(options),
+  );
+
+  if (response.status === 401) {
+    await refreshAccessToken();
+    response = await fetch(
+      `${API_BASE_URL}${endpoint}`,
+      buildRequestOptions(options),
+    );
+  }
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new Error(error.message || `HTTP error ${response.status}`);
+    const requestError = new Error(
+      error.message || `HTTP error ${response.status}`,
+    );
+    requestError.status = response.status;
+    throw requestError;
   }
 
   return response.json();
@@ -36,7 +82,11 @@ async function fetchPublicAPI(endpoint, options = {}) {
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new Error(error.message || `HTTP error ${response.status}`);
+    const requestError = new Error(
+      error.message || `HTTP error ${response.status}`,
+    );
+    requestError.status = response.status;
+    throw requestError;
   }
 
   return response.json();
@@ -239,8 +289,63 @@ export const organizationAPI = {
   },
 
   listUsers: async () => {
-    return fetchAPI("/organizations/users", {
+    return fetchAPI("/users", {
       method: "GET",
+    });
+  },
+
+  getUser: async (userId) => {
+    const encodedUserId = encodeURIComponent(userId);
+
+    return fetchAPI(`/users/${encodedUserId}`, {
+      method: "GET",
+    });
+  },
+
+  createUser: async (data) => {
+    const baseUrl = window.location.origin;
+    const payload = {
+      email: data.email,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      role: data.role,
+    };
+
+    if (
+      baseUrl &&
+      !baseUrl.includes("localhost") &&
+      !baseUrl.includes("127.0.0.1")
+    ) {
+      payload.passwordSetupUrl = `${baseUrl}/password-setup`;
+    }
+
+    return fetchAPI("/users", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  },
+
+  updateUser: async (userId, data) => {
+    const encodedUserId = encodeURIComponent(userId);
+    const payload = {
+      email: data.email,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      role: data.role,
+      status: data.status,
+    };
+
+    return fetchAPI(`/users/${encodedUserId}`, {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    });
+  },
+
+  deleteUser: async (userId) => {
+    const encodedUserId = encodeURIComponent(userId);
+
+    return fetchAPI(`/users/${encodedUserId}`, {
+      method: "DELETE",
     });
   },
 

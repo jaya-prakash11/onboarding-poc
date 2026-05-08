@@ -7,6 +7,9 @@ import ResetPassword from "./pages/ResetPassword";
 import PasswordSetup from "./pages/PasswordSetup";
 import VerifyOrganization from "./pages/VerifyOrganization";
 import ViewOrganizations from "./pages/ViewOrganizations";
+import ManageUsers from "./pages/ManageUsers";
+import CreateUser from "./pages/CreateUser";
+import EditUser from "./pages/EditUser";
 import "./App.css";
 import Dashboard from "./pages/Dashboard";
 import Header from "./components/Header";
@@ -57,6 +60,33 @@ function App() {
               <Header />
               <ViewOrganizations />
             </SuperAdminRoute>
+          }
+        />
+        <Route
+          path="/manage-users"
+          element={
+            <ProtectedRoute>
+              <Header />
+              <ManageUsers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/create-user"
+          element={
+            <ProtectedRoute>
+              <Header />
+              <CreateUser />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/edit-user/:userId"
+          element={
+            <ProtectedRoute>
+              <Header />
+              <EditUser />
+            </ProtectedRoute>
           }
         />
         <Route path="/" element={<Login />} />
