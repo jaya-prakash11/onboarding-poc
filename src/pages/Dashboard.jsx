@@ -215,23 +215,25 @@ function Dashboard() {
           </div>
         </section>
 
-        <section className="rounded-3xl bg-white p-6 text-left shadow-sm ring-1 ring-slate-200">
-          <h2 className="text-2xl font-semibold text-slate-900">
-            User Actions
-          </h2>
-          <p className="mt-2 text-sm text-slate-500">
-            Open user management to review all users in the system.
-          </p>
+        {!isSuperAdmin ? (
+          <section className="rounded-3xl bg-white p-6 text-left shadow-sm ring-1 ring-slate-200">
+            <h2 className="text-2xl font-semibold text-slate-900">
+              User Actions
+            </h2>
+            <p className="mt-2 text-sm text-slate-500">
+              Open user management to review all users in the system.
+            </p>
 
-          <div className="mt-6">
-            <Link
-              to="/manage-users"
-              className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
-            >
-              Manage Users
-            </Link>
-          </div>
-        </section>
+            <div className="mt-6">
+              <Link
+                to="/manage-users"
+                className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+              >
+                Manage Users
+              </Link>
+            </div>
+          </section>
+        ) : null}
 
         {isSuperAdmin ? (
           <section className="rounded-3xl bg-white p-6 text-left shadow-sm ring-1 ring-slate-200">
@@ -253,85 +255,87 @@ function Dashboard() {
           </section>
         ) : null}
 
-        <section className="rounded-3xl bg-white p-6 text-left shadow-sm ring-1 ring-slate-200">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <h2 className="text-2xl font-semibold text-slate-900">
-                Organization List
-              </h2>
-              <p className="mt-2 text-sm text-slate-500">
-                Review your organization details.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-6">
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-              <h3 className="text-lg font-semibold text-slate-900">
-                Organization Details
-              </h3>
-
-              {organizationLoading ? (
-                <p className="mt-4 text-sm text-slate-500">
-                  Loading organization details...
+        {!isSuperAdmin ? (
+          <section className="rounded-3xl bg-white p-6 text-left shadow-sm ring-1 ring-slate-200">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <h2 className="text-2xl font-semibold text-slate-900">
+                  Organization Details
+                </h2>
+                <p className="mt-2 text-sm text-slate-500">
+                  Review your organization details.
                 </p>
-              ) : organizationError ? (
-                <div className="mt-4 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
-                  {organizationError}
-                </div>
-              ) : organization ? (
-                <dl className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-                  <div>
-                    <dt className="text-xs font-semibold uppercase text-slate-400">
-                      Name
-                    </dt>
-                    <dd className="mt-1 text-sm font-medium text-slate-900">
-                      {formatValue(
-                        organization.organizationName ?? organization.name,
-                      )}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs font-semibold uppercase text-slate-400">
-                      Domain
-                    </dt>
-                    <dd className="mt-1 text-sm font-medium text-slate-900">
-                      {formatValue(organization.domain)}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs font-semibold uppercase text-slate-400">
-                      Contact Email
-                    </dt>
-                    <dd className="mt-1 text-sm font-medium text-slate-900">
-                      {formatValue(organization.contactEmail)}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs font-semibold uppercase text-slate-400">
-                      Contact Phone
-                    </dt>
-                    <dd className="mt-1 text-sm font-medium text-slate-900">
-                      {formatValue(organization.contactPhone)}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs font-semibold uppercase text-slate-400">
-                      Status
-                    </dt>
-                    <dd className="mt-1 text-sm font-medium text-slate-900">
-                      {formatValue(organization.status)}
-                    </dd>
-                  </div>
-                </dl>
-              ) : (
-                <p className="mt-4 text-sm text-slate-500">
-                  No organization details found.
-                </p>
-              )}
+              </div>
             </div>
-          </div>
-        </section>
+
+            <div className="mt-6">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                <h3 className="text-lg font-semibold text-slate-900">
+                  Organization Details
+                </h3>
+
+                {organizationLoading ? (
+                  <p className="mt-4 text-sm text-slate-500">
+                    Loading organization details...
+                  </p>
+                ) : organizationError ? (
+                  <div className="mt-4 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
+                    {organizationError}
+                  </div>
+                ) : organization ? (
+                  <dl className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+                    <div>
+                      <dt className="text-xs font-semibold uppercase text-slate-400">
+                        Name
+                      </dt>
+                      <dd className="mt-1 text-sm font-medium text-slate-900">
+                        {formatValue(
+                          organization.organizationName ?? organization.name,
+                        )}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs font-semibold uppercase text-slate-400">
+                        Domain
+                      </dt>
+                      <dd className="mt-1 text-sm font-medium text-slate-900">
+                        {formatValue(organization.domain)}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs font-semibold uppercase text-slate-400">
+                        Contact Email
+                      </dt>
+                      <dd className="mt-1 text-sm font-medium text-slate-900">
+                        {formatValue(organization.contactEmail)}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs font-semibold uppercase text-slate-400">
+                        Contact Phone
+                      </dt>
+                      <dd className="mt-1 text-sm font-medium text-slate-900">
+                        {formatValue(organization.contactPhone)}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs font-semibold uppercase text-slate-400">
+                        Status
+                      </dt>
+                      <dd className="mt-1 text-sm font-medium text-slate-900">
+                        {formatValue(organization.status)}
+                      </dd>
+                    </div>
+                  </dl>
+                ) : (
+                  <p className="mt-4 text-sm text-slate-500">
+                    No organization details found.
+                  </p>
+                )}
+              </div>
+            </div>
+          </section>
+        ) : null}
       </div>
     </div>
   );
