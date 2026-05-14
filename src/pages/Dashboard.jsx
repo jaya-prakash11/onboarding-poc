@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { authService, organizationAPI } from "../api/auth";
 
 function getOrganizationDetails(response) {
@@ -23,6 +23,7 @@ function getUserName(user) {
 }
 
 function Dashboard() {
+  const navigate = useNavigate();
   const currentUser = authService.getUser();
   const userRole = currentUser?.role;
   const isSuperAdmin = authService.isSuperAdmin();
@@ -33,6 +34,12 @@ function Dashboard() {
   const [userLoading, setUserLoading] = useState(isMember);
   const [organizationError, setOrganizationError] = useState("");
   const [userError, setUserError] = useState("");
+  const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
+
+  const handlePlanSelection = (path) => {
+    setIsSubscriptionModalOpen(false);
+    navigate(path);
+  };
 
   useEffect(() => {
     const loadOrganizationDetails = async () => {
@@ -206,12 +213,13 @@ function Dashboard() {
           </p>
 
           <div className="mt-6">
-            <Link
-              to="/add-organization"
+            <button
+              type="button"
+              onClick={() => setIsSubscriptionModalOpen(true)}
               className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
             >
               Create Organizations
-            </Link>
+            </button>
           </div>
         </section>
 
@@ -227,7 +235,8 @@ function Dashboard() {
             <div className="mt-6">
               <Link
                 to="/manage-users"
-                className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                // className="inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
               >
                 Manage Users
               </Link>
@@ -337,6 +346,84 @@ function Dashboard() {
           </section>
         ) : null}
       </div>
+
+      {isSubscriptionModalOpen ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 px-4 py-6"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="subscription-modal-title"
+        >
+          <div className="w-full max-w-3xl rounded-3xl bg-white p-6 text-left shadow-2xl ring-1 ring-slate-200 sm:p-8">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600">
+                  Subscription
+                </p>
+                <h2
+                  id="subscription-modal-title"
+                  className="mt-2 text-2xl font-semibold text-slate-900"
+                >
+                  Choose a plan
+                </h2>
+                <p className="mt-2 text-sm text-slate-500">
+                  Select the tier that matches how many organizations you need
+                  to create.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsSubscriptionModalOpen(false)}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-xl leading-none text-slate-500 transition hover:bg-slate-50 hover:text-slate-900"
+                aria-label="Close subscription modal"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              <article className="flex h-full flex-col rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                <h3 className="text-xl font-semibold text-slate-900">
+                  Free Tier
+                </h3>
+                <ul className="mt-4 space-y-2 text-sm text-slate-600">
+                  <li>Free plan access</li>
+                  <li>1 organization creation</li>
+                  <li>Basic organization onboarding</li>
+                  <li>Expires after 30 days</li>
+                </ul>
+                <button
+                  type="button"
+                  onClick={() => handlePlanSelection("/add-organization")}
+                  className="mt-6 inline-flex items-center justify-center rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
+                >
+                  Continue with Free
+                </button>
+              </article>
+
+              <article className="flex h-full flex-col rounded-2xl border border-blue-200 bg-blue-50 p-5">
+                <h3 className="text-xl font-semibold text-slate-900">
+                  Paid Tier 2
+                </h3>
+                <ul className="mt-4 space-y-2 text-sm text-slate-600">
+                  <li>Create more than one organization</li>
+                  <li>Designed for growing admin teams</li>
+                  <li>Upgrade before continuing onboarding</li>
+                  <li>Unlimited use</li>
+                </ul>
+                <button
+                  type="button"
+                  onClick={() => handlePlanSelection("/payment-processing")}
+                  className="mt-6 inline-flex items-center justify-center rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                >
+                  Continue with Paid
+                </button>
+              </article>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

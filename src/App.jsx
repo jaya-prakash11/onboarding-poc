@@ -10,6 +10,7 @@ import ViewOrganizations from "./pages/ViewOrganizations";
 import ManageUsers from "./pages/ManageUsers";
 import CreateUser from "./pages/CreateUser";
 import EditUser from "./pages/EditUser";
+import PaymentProcessing from "./pages/PaymentProcessing";
 import "./App.css";
 import Dashboard from "./pages/Dashboard";
 import Header from "./components/Header";
@@ -53,6 +54,15 @@ function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/set-password" element={<PasswordSetup />} />
         <Route path="/organizations/verify" element={<VerifyOrganization />} />
+        <Route
+          path="/payment-processing"
+          element={
+            <ProtectedRoute>
+              <Header />
+              <PaymentProcessing />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/view-organizations"
           element={
